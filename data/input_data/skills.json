@@ -1,0 +1,12 @@
+{
+    "required_skills": [
+        "Python",
+        "SQL",
+        "Machine Learning",
+        "Deep Learning",
+        "LLM",
+        "LangChain",
+        "RAG",
+        "FastAPI"
+    ]
+}

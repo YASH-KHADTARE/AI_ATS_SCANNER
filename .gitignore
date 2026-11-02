@@ -1,0 +1,49 @@
+# ============================================================
+# AI ATS Scanner - .gitignore
+# ============================================================
+
+# ---- Secrets (never commit) --------------------------------
+.env
+.env.*
+!.env.example
+
+# ---- Virtual environment -----------------------------------
+ai_ats_scanner/
+.venv/
+venv/
+env/
+
+# ---- Python ------------------------------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ---- Job data (uploaded resumes, candidate PII, results) ---
+jobs/
+
+# ---- Notebook data: resumes (candidate PII), outputs, logs --
+data/input_data/Resumes.zip
+data/input_data/Resumes/
+data/output_data/
+data/logs/
+*.log
+
+# ---- Jupyter -----------------------------------------------
+.ipynb_checkpoints/
+
+# ---- Editors / OS ------------------------------------------
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Temporary files ---------------------------------------
+*.tmp
+*.tmp.csv
+~$*.xlsx

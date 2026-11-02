@@ -1,0 +1,12 @@
+{
+    "minimum_experience": {
+        "years": 2,
+        "months": 0
+    },
+    "maximum_experience": {
+        "years": 3,
+        "months": 0
+    },
+    "minimum_matched_skills": 5,
+    "minimum_skill_match_ratio": null
+}

@@ -1,0 +1,29 @@
+Job Title: AI/ML Engineer
+Experience: 2 years
+
+Job Description:
+We are looking for an AI/ML Engineer with around 2 years of
+professional experience to design, build and deploy machine
+learning and Generative AI applications.
+
+Responsibilities:
+- Build, train and evaluate machine learning and deep learning models.
+- Develop LLM-powered applications using LangChain.
+- Build Retrieval-Augmented Generation (RAG) pipelines with vector databases.
+- Develop and deploy model-serving APIs using Python and FastAPI.
+- Clean, process and analyze structured and unstructured data with SQL and Python.
+- Containerize and deploy applications using Docker.
+- Collaborate with engineering and product teams to ship AI features.
+
+Requirements:
+- 2 years of professional experience in AI/ML or a related role.
+- Strong Python programming skills.
+- Solid understanding of machine learning and deep learning concepts.
+- Hands-on experience with LLMs, LangChain and RAG.
+- Experience building REST APIs with FastAPI.
+- Working knowledge of SQL.
+
+Preferred:
+- Experience with Docker.
+- Experience with a cloud platform (AWS, GCP or Azure).
+- Experience with vector databases (FAISS, Chroma, Pinecone or similar).

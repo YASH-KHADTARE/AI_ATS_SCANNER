@@ -1,0 +1,80 @@
+# Project: AI ATS Scanner
+
+## 1. Objective
+Build an AI-powered Applicant Tracking System (ATS) backend that screens resumes and ranks the best candidates for a job. HR uploads resumes and the job criteria once; the ranked results stay stored per job and can be retrieved later.
+
+## 2. Tech Stack
+- Python 3.11
+- FastAPI + Uvicorn (backend only, no frontend)
+- Docling for PDF -> Markdown conversion
+- Google Gemini (via LangChain) for structured extraction and evidence-based scoring
+- Pandas for CSV/Excel processing (openpyxl for .xlsx)
+- File-system storage: one folder per job under jobs/
+- Postman for API testing
+- VS Code for development
+
+## 3. Code Layout
+- config/config.py        project paths, model settings, validation helpers,
+                          per-job path builder (get_job_paths), form-input parsing
+- src/main/main.py        FastAPI application; includes the four routers
+- src/api/                one file per route:
+                          screen_job.py, list_jobs.py, job_results.py,
+                          download_results.py (+ common.py shared helpers)
+- src/helpers/            pipeline stages (see section 4) and pipeline.py,
+                          which orchestrates them for one job
+- jobs/<JOB_ID>/          all data for one executed job
+- data/, notebook/        notebook inputs/outputs and the exploratory notebooks
+- Design rule: plain functions and dicts only, no classes.
+
+## 4. Project Workflow (POST /jobs/screen)
+
+1. **Receive Inputs:** HR submits a multipart form: a ZIP of PDF resumes, job position, job description, key skills (comma-separated), a skill threshold (e.g. 2/3) and an experience range (years + months, min and max). The server validates the inputs, generates a Job ID and creates jobs/<JOB_ID>/.
+
+2. **Prepare Resumes:** The ZIP is validated and extracted safely (no path traversal, no overwrites). Only PDF files are kept; everything else is skipped and reported.
+
+3. **Identify Candidates:** Each PDF receives a stable candidate ID (CAND_000001, ...) recorded in candidate_manifest.csv with its SHA-256 fingerprint.
+
+4. **Resume Extraction:** Docling converts every PDF to Markdown. Gemini then extracts structured data from the Markdown: candidate name, email, phone, total professional experience (years/months, computed from employment date ranges) and a 0/1 flag for each key skill. Only the skills HR passed are included in the prompt. Results are appended to 1_resume_analysis.csv after each resume.
+
+5. **Filter Candidates:** Python applies the HR criteria: experience within the requested range and skill matches meeting the threshold (fraction, ratio or count). Output: 2_shortlisted_candidates.csv.
+
+6. **Score Candidates:** Gemini scores each shortlisted candidate against the Job Description on three criteria: resume quality (20 %), skills/projects/experience (40 %) and JD match (40 %). Python computes the weighted final score.
+
+7. **Rank Candidates:** Candidates are sorted by final score (highest first) and saved to 3_ranked_candidates.csv and 3_ranked_candidates.xlsx.
+
+8. **Save Results:** The PDFs of all shortlisted candidates are copied to shortlisted_resumes/. status.json records the stage reached, counts (resumes, skipped files, analyzed, shortlisted, ranked, failures) and any error. All form inputs are kept in input/job.json.
+
+9. **Retrieve Results:** HR can later call
+   - GET /jobs                              list of executed jobs (name, ID, status)
+   - GET /jobs/{job_id}/results             ranked candidates as JSON
+   - GET /jobs/{job_id}/results/download    ranked candidates as Excel
+   without rerunning the analysis.
+
+## 5. Job Workspace
+jobs/<JOB_ID>/
+  input/resumes.zip, input/job.json
+  resumes/                 extracted PDFs
+  markdown/                Docling output
+  results/                 1_resume_analysis.csv, 2_shortlisted_candidates.csv,
+                           3_ranked_candidates.csv, 3_ranked_candidates.xlsx
+  shortlisted_resumes/     PDFs of candidates who passed the filters
+  logs/                    resume_analysis_errors.log, candidate_scoring_errors.log
+  candidate_manifest.csv
+  status.json
+
+## 6. Important Requirements (status)
+- HR defines the experience range, key skills and skill threshold per job.   [done]
+- Extract resume information once per job and store it with the job.        [done]
+- Apply eligibility filters in Python; use AI only for extraction/scoring.   [done]
+- Python computes final scores and sorting.                                  [done]
+- Keep extracted data (results/1_*) separate from screening results (2_*, 3_*). [done]
+- Preserve screening history: every job keeps its full workspace.            [done]
+- Flag missing information: blank name/email/phone, skipped files and failed resumes are reported in status.json and the response. [done]
+- Build and test all APIs with FastAPI and Postman.                          [done]
+- Top-X shortlisting and preferred (non-mandatory) skills.                   [not yet]
+- SQLite persistence (currently file-system per job).                        [not yet]
+
+## 7. Running
+From the project root: uvicorn src.main.main:app --reload
+Docs: http://127.0.0.1:8000/docs
+Requires GOOGLE_API_KEY in .env.
