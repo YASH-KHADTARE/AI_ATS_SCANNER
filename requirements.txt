@@ -1,0 +1,11 @@
+# Direct dependencies of the AI ATS Scanner API (Python 3.11).
+# Versions match the environment the project was developed and tested in.
+fastapi==0.162.0
+uvicorn[standard]==0.54.0
+python-multipart==0.0.33
+python-dotenv==1.2.4
+pandas==3.0.6
+openpyxl==3.1.5
+docling==2.140.0
+langchain-core==1.6.12
+langchain-google-genai==4.4.2

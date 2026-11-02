@@ -7,6 +7,89 @@ the HR criteria, scores the eligible ones against the Job Description and
 returns a ranked list. Everything for a job is stored in its own folder
 and can be retrieved later through the API.
 
+Repository: https://github.com/YASH-KHADTARE/AI_ATS_SCANNER
+
+---
+
+## Quick Start (clone and run)
+
+Prerequisites: [Git](https://git-scm.com/downloads), **Python 3.11** and a
+[Google Gemini API key](https://aistudio.google.com/app/apikey).
+
+**1. Clone the repository**
+
+```bash
+git clone https://github.com/YASH-KHADTARE/AI_ATS_SCANNER.git
+cd AI_ATS_SCANNER
+```
+
+The code lives on the `feature/ats-api` branch, which is the default, so
+the clone already has it checked out. To be explicit:
+
+```bash
+git clone -b feature/ats-api https://github.com/YASH-KHADTARE/AI_ATS_SCANNER.git
+```
+
+**2. Create and activate a virtual environment**
+
+```powershell
+# Windows (PowerShell)
+python -m venv ai_ats_scanner
+.\ai_ats_scanner\Scripts\Activate.ps1
+```
+
+```bash
+# macOS / Linux
+python3.11 -m venv ai_ats_scanner
+source ai_ats_scanner/bin/activate
+```
+
+**3. Install the dependencies**
+
+```bash
+pip install -r requirements.txt
+```
+
+Docling downloads its PDF models on first use, so the first run of a job
+takes a few extra minutes and needs internet access.
+
+**4. Add your Gemini API key**
+
+Copy the template and fill in the key. `.env` is git-ignored, so it never
+gets committed.
+
+```bash
+# Windows (PowerShell)
+Copy-Item .env.example .env
+
+# macOS / Linux
+cp .env.example .env
+```
+
+Then open `.env` and set:
+
+```
+GOOGLE_API_KEY=your_gemini_api_key_here
+```
+
+**5. Start the API**
+
+```bash
+uvicorn src.main.main:app --reload
+```
+
+Open http://127.0.0.1:8000/docs to try the endpoints from the browser, or
+follow the Postman steps in §7. The first request to `POST /jobs/screen`
+creates the `jobs/` folder automatically.
+
+**Troubleshooting**
+
+| Symptom | Fix |
+|---|---|
+| `GOOGLE_API_KEY is missing` on startup | Step 4: `.env` must sit in the project root next to `readme.md`. |
+| `Activate.ps1 cannot be loaded` (PowerShell) | Run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once, then activate again. |
+| `python` is not 3.11 | Install 3.11 and create the venv with `py -3.11 -m venv ai_ats_scanner` (Windows) or `python3.11 -m venv ...`. |
+
 ---
 
 ## 1. Tech Stack
@@ -25,7 +108,9 @@ and can be retrieved later through the API.
 
 ```
 AI_ATS_SCANNER/
-├── .env                        GOOGLE_API_KEY=...
+├── .env                        GOOGLE_API_KEY=... (git-ignored)
+├── .env.example                template for .env
+├── requirements.txt            pinned Python dependencies
 ├── readme.md
 ├── project_architecture.txt
 │
@@ -72,16 +157,9 @@ the notebooks only; the API receives all inputs through the request form.
 
 ## 3. Setup
 
-```powershell
-# 1. Activate the virtual environment
-.\ai_ats_scanner\Scripts\Activate.ps1
-
-# 2. Install dependencies (already present in the bundled venv)
-pip install fastapi "uvicorn[standard]" python-multipart python-dotenv pandas openpyxl docling langchain-core langchain-google-genai
-
-# 3. Add your Gemini key
-#    .env  ->  GOOGLE_API_KEY=your_key_here
-```
+Follow the **Quick Start** above for a fresh clone. In short: create a
+Python 3.11 virtual environment, run `pip install -r requirements.txt`,
+copy `.env.example` to `.env` and set `GOOGLE_API_KEY`.
 
 Model names, temperature, request delay and scoring weights live in
 `config/config.py` (`EXTRACTION_MODEL`, `SCORING_MODEL`, `*_WEIGHT`).
